@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Event Notifications</title>
+    <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<main class="page">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Spring Boot 3.4 + Mailtrap</p>
+            <h1>Event-driven notification simulator</h1>
+            <p class="lede">Simulate teammate invites, task assignments, comments, and weekly digests without building the full product.</p>
+        </div>
+        <div class="hero-card">
+            <div class="metric">
+                <span th:text="${#lists.size(teams)}">0</span>
+                <small>Teams</small>
+            </div>
+            <div class="metric">
+                <span th:text="${#lists.size(users)}">0</span>
+                <small>Users</small>
+            </div>
+            <div class="metric">
+                <span th:text="${#lists.size(tasks)}">0</span>
+                <small>Tasks</small>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid">
+        <article class="card">
+            <h2>Invite teammate</h2>
+            <form data-endpoint="/api/events/invite">
+                <label>Inviter email<input name="inviterEmail" value="alice@acme.test"></label>
+                <label>Invitee name<input name="inviteeName" value="Diana Ward"></label>
+                <label>Invitee email<input name="inviteeEmail" value="diana@acme.test"></label>
+                <button type="submit">Send invite event</button>
+            </form>
+        </article>
+
+        <article class="card">
+            <h2>Assign task</h2>
+            <form data-endpoint="/api/events/task-assigned">
+                <label>Task ID<input name="taskId" value="1" type="number"></label>
+                <label>Assigner email<input name="assignerEmail" value="alice@acme.test"></label>
+                <label>Assignee email<input name="assigneeEmail" value="bob@acme.test"></label>
+                <button type="submit">Send task event</button>
+            </form>
+        </article>
+
+        <article class="card">
+            <h2>Post comment</h2>
+            <form data-endpoint="/api/events/comment">
+                <label>Task ID<input name="taskId" value="1" type="number"></label>
+                <label>Author email<input name="authorEmail" value="bob@acme.test"></label>
+                <label>Comment body<textarea name="body">I pushed a fix for the performance issue.</textarea></label>
+                <button type="submit">Send comment event</button>
+            </form>
+        </article>
+
+        <article class="card">
+            <h2>Weekly digest</h2>
+            <form data-endpoint="/api/digest/trigger">
+                <label>Team ID (optional)<input name="teamId" type="number"></label>
+                <label>Window days<input name="days" value="7" type="number"></label>
+                <button type="submit">Trigger digest</button>
+            </form>
+        </article>
+    </section>
+
+    <section class="grid lower">
+        <article class="card">
+            <h2>Seeded users</h2>
+            <ul class="list">
+                <li th:each="user : ${users}" th:text="${user.name + ' · ' + user.email + ' · ' + user.role}">User</li>
+            </ul>
+        </article>
+        <article class="card">
+            <h2>Seeded tasks</h2>
+            <ul class="list">
+                <li th:each="task : ${tasks}" th:text="${'#' + task.id + ' · ' + task.title}">Task</li>
+            </ul>
+        </article>
+        <article class="card">
+            <h2>Recent activity</h2>
+            <ul class="list">
+                <li th:each="activity : ${activityEvents}" th:text="${activity.type + ' · ' + activity.occurredAt}">Activity</li>
+            </ul>
+        </article>
+        <article class="card output-card">
+            <h2>API result</h2>
+            <pre id="output">Submit a form to see the JSON response.</pre>
+        </article>
+    </section>
+</main>
+
+<script>
+    const output = document.getElementById('output');
+    document.querySelectorAll('form[data-endpoint]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const body = {};
+            new FormData(form).forEach((value, key) => {
+                if (value !== '') {
+                    body[key] = /^\d+$/.test(value) ? Number(value) : value;
+                }
+            });
+            const response = await fetch(form.dataset.endpoint, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            const payload = await response.json();
+            output.textContent = JSON.stringify(payload, null, 2);
+        });
+    });
+</script>
+</body>
+</html>
