@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Error</title>
+    <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<main class="page">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Application error</p>
+            <h1>Something went wrong.</h1>
+            <p class="lede">The application could not render this page. Return to the dashboard and try again.</p>
+            <a class="button-link" href="/">Back to dashboard</a>
+        </div>
+        <div class="hero-card">
+            <div class="metric">
+                <span th:text="${status ?: 500}">500</span>
+                <small>Status</small>
+            </div>
+            <div class="metric">
+                <span th:text="${error ?: 'Error'}">Error</span>
+                <small>Type</small>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -56,7 +56,30 @@ Mail delivery failures are isolated:
 
 ## Setup
 
-1. Set Mailtrap variables if you want real email delivery.
+1. Optional: set Mailtrap variables if you want real email delivery.
+
+Without Mailtrap configuration, the app still runs locally, but notification sends are skipped.
+
+Required for Mailtrap delivery:
+
+- `MAILTRAP_API_TOKEN`
+- `MAILTRAP_TEMPLATE_TEAMMATE_INVITED`
+- `MAILTRAP_TEMPLATE_TASK_ASSIGNED`
+- `MAILTRAP_TEMPLATE_COMMENT_POSTED`
+- `MAILTRAP_TEMPLATE_WEEKLY_DIGEST`
+
+Optional overrides:
+
+- `MAIL_FROM_ADDRESS` default: `no-reply@example.test`
+- `MAIL_FROM_NAME` default: `Spring Event Notifications`
+- `MAILTRAP_SANDBOX` default: `false`
+- `MAILTRAP_INBOX_ID` default: `0`, required only if `MAILTRAP_SANDBOX` is `true`
+- `SERVER_PORT` default: `8080`
+- `DIGEST_WINDOW_DAYS` default: `7`
+- `DIGEST_CRON` default: `0 0 9 * * MON`
+- `DIGEST_ZONE` default: `Europe/Kiev`
+
+PowerShell:
 
 ```powershell
 $env:MAILTRAP_API_TOKEN="your-token"
@@ -69,11 +92,29 @@ $env:MAILTRAP_TEMPLATE_COMMENT_POSTED="template-uuid-3"
 $env:MAILTRAP_TEMPLATE_WEEKLY_DIGEST="template-uuid-4"
 ```
 
-Optional sandbox mode:
+macOS/Linux:
+
+```bash
+export MAILTRAP_API_TOKEN="your-token"
+export MAIL_FROM_ADDRESS="[email protected]"
+export MAIL_FROM_NAME="Spring Event Notifications"
+
+export MAILTRAP_TEMPLATE_TEAMMATE_INVITED="template-uuid-1"
+export MAILTRAP_TEMPLATE_TASK_ASSIGNED="template-uuid-2"
+export MAILTRAP_TEMPLATE_COMMENT_POSTED="template-uuid-3"
+export MAILTRAP_TEMPLATE_WEEKLY_DIGEST="template-uuid-4"
+```
+
+Optional Mailtrap sandbox mode:
 
 ```powershell
 $env:MAILTRAP_SANDBOX="true"
 $env:MAILTRAP_INBOX_ID="123456"
+```
+
+```bash
+export MAILTRAP_SANDBOX="true"
+export MAILTRAP_INBOX_ID="123456"
 ```
 
 2. Run the app.
@@ -82,10 +123,16 @@ $env:MAILTRAP_INBOX_ID="123456"
 .\gradlew bootRun
 ```
 
+```bash
+./gradlew bootRun
+```
+
 3. Open:
 
 - UI: `http://localhost:8080/`
 - H2 console: `http://localhost:8080/h2-console`
+
+If you set `SERVER_PORT`, replace `8080` in the URLs above with your configured port.
 
 H2 connection settings:
 
@@ -219,6 +266,7 @@ Default schedule:
 
 - cron: `0 0 9 * * MON`
 - zone: `Europe/Kiev`
+- window: `7` days
 
 Override with:
 
@@ -256,6 +304,10 @@ Run:
 .\gradlew test
 ```
 
+```bash
+./gradlew test
+```
+
 The test suite covers real flows only:
 
 - invite endpoint records activity
@@ -283,4 +335,6 @@ The current implementation was verified locally with:
 
 - `.\gradlew test`
 - `.\gradlew bootRun`
+- `./gradlew test`
+- `./gradlew bootRun`
 - HTTP `200` from `http://localhost:8080/`
